@@ -8,7 +8,7 @@ declare global {
 
 function readLang() {
   const m = document.cookie.match(/googtrans=\/en\/([^;]+)/);
-  return m ? decodeURIComponent(m[1]) : "en";
+  return m?.[1] ? decodeURIComponent(m[1]) : "en";
 }
 
 export function LanguageSelect() {
