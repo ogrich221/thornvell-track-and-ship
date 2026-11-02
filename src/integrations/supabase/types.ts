@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       enquiries: {
         Row: {
+          admin_response: string | null
+          cargo_description: string | null
           company: string | null
           created_at: string
           destination: string | null
@@ -26,10 +28,19 @@ export type Database = {
           message: string | null
           origin: string | null
           phone: string
+          preferred_date: string | null
+          quote_status: string
+          responded_at: string | null
           service: string
           shipment_details: string | null
+          shipment_type: string | null
+          transport_method: string | null
+          user_id: string | null
+          weight_dimensions: string | null
         }
         Insert: {
+          admin_response?: string | null
+          cargo_description?: string | null
           company?: string | null
           created_at?: string
           destination?: string | null
@@ -40,10 +51,19 @@ export type Database = {
           message?: string | null
           origin?: string | null
           phone: string
+          preferred_date?: string | null
+          quote_status?: string
+          responded_at?: string | null
           service: string
           shipment_details?: string | null
+          shipment_type?: string | null
+          transport_method?: string | null
+          user_id?: string | null
+          weight_dimensions?: string | null
         }
         Update: {
+          admin_response?: string | null
+          cargo_description?: string | null
           company?: string | null
           created_at?: string
           destination?: string | null
@@ -54,8 +74,102 @@ export type Database = {
           message?: string | null
           origin?: string | null
           phone?: string
+          preferred_date?: string | null
+          quote_status?: string
+          responded_at?: string | null
           service?: string
           shipment_details?: string | null
+          shipment_type?: string | null
+          transport_method?: string | null
+          user_id?: string | null
+          weight_dimensions?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          channel: string
+          created_at: string
+          event_id: string | null
+          id: string
+          shipment_id: string | null
+          status: string
+          subject: string | null
+          user_id: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          shipment_id?: string | null
+          status?: string
+          subject?: string | null
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          shipment_id?: string | null
+          status?: string
+          subject?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          notify_email: boolean
+          notify_sms: boolean
+          notify_whatsapp: boolean
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          notify_email?: boolean
+          notify_sms?: boolean
+          notify_whatsapp?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          notify_email?: boolean
+          notify_sms?: boolean
+          notify_whatsapp?: boolean
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -96,9 +210,14 @@ export type Database = {
       }
       shipments: {
         Row: {
+          cargo_description: string | null
           created_at: string
+          current_location: string | null
           current_status: string
+          customer_id: string | null
           destination: string | null
+          dispatch_date: string | null
+          estimated_delivery: string | null
           id: string
           origin: string | null
           service: string | null
@@ -106,9 +225,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cargo_description?: string | null
           created_at?: string
+          current_location?: string | null
           current_status?: string
+          customer_id?: string | null
           destination?: string | null
+          dispatch_date?: string | null
+          estimated_delivery?: string | null
           id?: string
           origin?: string | null
           service?: string | null
@@ -116,9 +240,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cargo_description?: string | null
           created_at?: string
+          current_location?: string | null
           current_status?: string
+          customer_id?: string | null
           destination?: string | null
+          dispatch_date?: string | null
+          estimated_delivery?: string | null
           id?: string
           origin?: string | null
           service?: string | null
@@ -127,15 +256,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -262,6 +415,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "customer"],
+    },
   },
 } as const
