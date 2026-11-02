@@ -7,6 +7,7 @@ import { CONTACT, NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Logo } from "./Logo";
 import { LanguageSelect } from "./LanguageSelect";
+import { NavArrows } from "./NavArrows";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -70,6 +71,9 @@ export function SiteHeader() {
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
+      </div>
+      <div className="container-x -mt-2 flex pb-2">
+        <NavArrows />
       </div>
       <div
         id="mobile-nav"

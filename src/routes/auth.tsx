@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { DashboardShell, GlassCard, glassField, TabBar } from "@/components/portal/DashboardShell";
 
 export const Route = createFileRoute("/auth")({
@@ -83,7 +84,7 @@ function AuthPage() {
           )}
           <L label="Email"><input name="email" type="email" required autoComplete="email" className={glassField} /></L>
           {mode !== "forgot" && (
-            <L label="Password"><input name="password" type="password" required minLength={mode === "register" ? 8 : undefined} autoComplete={mode === "register" ? "new-password" : "current-password"} className={glassField} /></L>
+            <L label="Password"><PasswordInput name="password" required minLength={mode === "register" ? 8 : undefined} autoComplete={mode === "register" ? "new-password" : "current-password"} className={glassField} /></L>
           )}
           <Button type="submit" variant="gold" size="xl" disabled={busy}>
             {busy && <Loader2 className="animate-spin" />}
