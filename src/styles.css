@@ -119,3 +119,7 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Hide Google Translate banner */
+.goog-te-banner-frame, .skiptranslate iframe, #goog-gt-tt { display: none !important; }
+body { top: 0 !important; }
