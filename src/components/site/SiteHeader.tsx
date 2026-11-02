@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CONTACT, NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Logo } from "./Logo";
+import { LanguageSelect } from "./LanguageSelect";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -27,8 +28,11 @@ export function SiteHeader() {
         overHero ? "bg-transparent" : "border-b border-navy-foreground/10 bg-navy-deep/95 shadow-elegant backdrop-blur",
       )}
     >
-      <div className="container-x flex h-20 items-center justify-between gap-6">
-        <Logo light />
+      <div className="container-x flex h-20 items-center justify-between gap-3 lg:gap-6">
+        <div className="flex items-center gap-3">
+          <LanguageSelect />
+          <Logo light />
+        </div>
         <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
           {NAV.map((n) => (
             <Link
