@@ -19,7 +19,7 @@ export function SectionHeading({ eyebrow, title, text, light, center }: { eyebro
 export function PageHero({ eyebrow, title, text, img }: { eyebrow: string; title: string; text: string; img: string }) {
   return (
     <section className="relative isolate overflow-hidden bg-navy-deep pb-20 pt-40">
-      <img src={img} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-50" />
+      <img src={img} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-70" />
       <div className="absolute inset-0 -z-10 bg-hero-overlay" />
       <div className="container-x animate-fade-up">
         <p className="eyebrow">{eyebrow}</p>
