@@ -16,6 +16,7 @@ import {
 import { ContactDetails } from "@/components/site/ContactDetails";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { SectionHeading } from "@/components/site/Sections";
+import { CoverageGlobe } from "@/components/site/CoverageGlobe";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -82,6 +83,7 @@ function Index() {
           <div className="lg:col-span-3"><EnquiryForm kind="contact" /></div>
         </div>
       </section>
+      <CoverageGlobe />
     </>
   );
 }
