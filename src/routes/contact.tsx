@@ -46,7 +46,7 @@ function Contact() {
             <SectionHeading eyebrow="Get in touch" title="Talk to our team." />
             <div className="mt-10"><ContactDetails /></div>
           </div>
-          <div className="lg:col-span-3"><EnquiryForm key={`${type}-${service}`} kind={isQuote ? "quote" : "contact"} defaultService={service} /></div>
+          <div className="lg:col-span-3"><EnquiryForm key={`${type}-${service}`} kind={isQuote ? "quote" : "contact"} defaultService={service ?? ""} /></div>
         </div>
       </section>
       <section id="faq" className="scroll-mt-24 bg-secondary py-24">
