@@ -1,9 +1,9 @@
 # Roadmap
-- [ ] Database: profiles, roles, customer-linked shipments, richer quotes, notification log
-- [ ] Customer login/register/reset + portal (dashboard, shipments, quotes, profile, notification prefs)
-- [ ] Tracking: dispatch/ETA/location fields + visual timeline
-- [ ] Quote form with full fields
-- [ ] Admin dashboard (shipments, customers, quotes, reports)
+- [x] Database: profiles, roles, customer-linked shipments, richer quotes, notification log
+- [x] Customer login/register/reset + portal
+- [x] Tracking: dispatch/ETA/location + visual timeline
+- [x] Quote form with full fields
+- [x] Admin dashboard
 - [ ] Email notifications (blocked: email domain setup)
-- [ ] Mobile + desktop friendly layouts for all new screens
-- [ ] Glass-style dashboards (customer + admin) featuring the logo
+- [x] Mobile + desktop layouts
+- [x] Glass-style dashboards with logo
