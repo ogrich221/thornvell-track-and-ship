@@ -14,6 +14,9 @@ export type TrackingResult =
         service: string | null;
         currentStatus: string;
         updatedAt: string;
+        dispatchDate: string | null;
+        estimatedDelivery: string | null;
+        currentLocation: string | null;
       };
       events: { status: string; location: string | null; note: string | null; occurredAt: string }[];
     };
@@ -31,7 +34,7 @@ export const trackShipment = createServerFn({ method: "POST" })
 
     const { data: shipment, error } = await supabaseAdmin
       .from("shipments")
-      .select("id, tracking_reference, origin, destination, service, current_status, updated_at")
+      .select("id, tracking_reference, origin, destination, service, current_status, updated_at, dispatch_date, estimated_delivery, current_location")
       .eq("tracking_reference", data.reference)
       .maybeSingle();
     if (error) throw new Error("Tracking is temporarily unavailable.");
@@ -52,6 +55,9 @@ export const trackShipment = createServerFn({ method: "POST" })
         service: shipment.service,
         currentStatus: shipment.current_status,
         updatedAt: shipment.updated_at,
+        dispatchDate: shipment.dispatch_date,
+        estimatedDelivery: shipment.estimated_delivery,
+        currentLocation: shipment.current_location,
       },
       events: (events ?? []).map((e) => ({
         status: e.status,
