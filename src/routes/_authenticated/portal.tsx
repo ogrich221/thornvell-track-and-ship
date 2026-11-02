@@ -226,7 +226,10 @@ function ProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () => vo
       })
       .eq("id", profile.id);
     setBusy(false);
-    if (error) return toast.error("Could not save your profile.");
+    if (error) {
+      toast.error("Could not save your profile.");
+      return;
+    }
     toast.success("Profile saved");
     onSaved();
   }

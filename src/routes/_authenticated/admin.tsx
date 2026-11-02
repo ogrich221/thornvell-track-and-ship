@@ -207,7 +207,7 @@ function EventPanel({ shipmentId, current }: { shipmentId: string; current: stri
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    const f = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    const f = Object.fromEntries(new FormData(form)) as { status: string; location: string; note: string };
     setBusy(true);
     try {
       await add({ data: { shipmentId, status: f.status as (typeof SHIPMENT_STATUSES)[number], location: f.location, note: f.note } });
@@ -278,7 +278,7 @@ function QuoteDetail({ q }: { q: Overview["quotes"][number] }) {
   ];
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+    const f = Object.fromEntries(new FormData(e.currentTarget)) as { status: string; response: string };
     setBusy(true);
     try {
       await save({ data: { id: q.id, status: f.status as (typeof QUOTE_STATUSES)[number], response: f.response } });

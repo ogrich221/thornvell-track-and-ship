@@ -28,7 +28,7 @@ function ResetPage() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+    const f = Object.fromEntries(new FormData(e.currentTarget)) as { password: string; confirm: string };
     if (f.password.length < 8) return setErr("Password must be at least 8 characters.");
     if (f.password !== f.confirm) return setErr("Passwords do not match.");
     setBusy(true);
