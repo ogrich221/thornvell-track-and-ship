@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { DashboardShell, GlassCard, glassField } from "@/components/portal/DashboardShell";
 
 export const Route = createFileRoute("/reset-password")({
@@ -43,8 +44,8 @@ function ResetPage() {
     <DashboardShell eyebrow="Account security" title="Set a new password">
       <GlassCard className="mx-auto max-w-md">
         <form onSubmit={onSubmit} className="grid gap-4">
-          <label className="grid gap-1.5 text-sm font-medium">New password<input name="password" type="password" required autoComplete="new-password" className={glassField} /></label>
-          <label className="grid gap-1.5 text-sm font-medium">Confirm password<input name="confirm" type="password" required autoComplete="new-password" className={glassField} /></label>
+          <label className="grid gap-1.5 text-sm font-medium">New password<PasswordInput name="password" required autoComplete="new-password" className={glassField} /></label>
+          <label className="grid gap-1.5 text-sm font-medium">Confirm password<PasswordInput name="confirm" required autoComplete="new-password" className={glassField} /></label>
           {err && <p role="alert" className="text-sm text-destructive">{err}</p>}
           <Button type="submit" variant="gold" size="xl" disabled={busy}>{busy && <Loader2 className="animate-spin" />}Update password</Button>
         </form>
