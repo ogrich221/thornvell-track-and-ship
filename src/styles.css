@@ -123,3 +123,21 @@
 /* Hide Google Translate banner */
 .goog-te-banner-frame, .skiptranslate iframe, #goog-gt-tt { display: none !important; }
 body { top: 0 !important; }
+
+/* Glass dashboard surfaces */
+@utility glass {
+  background: color-mix(in oklab, var(--navy-foreground) 7%, transparent);
+  border: 1px solid color-mix(in oklab, var(--navy-foreground) 14%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 20px 50px -20px color-mix(in oklab, var(--navy-deep) 80%, transparent), inset 0 1px 0 color-mix(in oklab, var(--navy-foreground) 12%, transparent);
+}
+@utility glass-input {
+  background: color-mix(in oklab, var(--navy-foreground) 6%, transparent);
+  border: 1px solid color-mix(in oklab, var(--navy-foreground) 18%, transparent);
+  color: var(--navy-foreground);
+}
+@keyframes drift { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(4%, -3%) scale(1.08); } }
+@keyframes slow-spin { to { transform: rotate(360deg); } }
+@utility animate-drift { animation: drift 18s ease-in-out infinite; }
+@utility animate-slow-spin { animation: slow-spin 60s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .animate-drift, .animate-slow-spin { animation: none; } }

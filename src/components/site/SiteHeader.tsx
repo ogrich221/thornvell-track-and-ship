@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Menu, Phone, X } from "lucide-react";
+import { Menu, Phone, UserRound, X } from "lucide-react";
+import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { CONTACT, NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,9 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
-  const overHero = pathname === "/" && !scrolled && !open;
+  const { user } = useSession();
+  const portalLabel = user ? "My Portal" : "Customer Login";
+  const overHero = (pathname === "/" || pathname === "/portal" || pathname === "/admin" || pathname === "/auth") && !scrolled && !open;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -29,7 +32,7 @@ export function SiteHeader() {
       )}
     >
       <div className="container-x flex h-20 items-center justify-between gap-3 lg:gap-6">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <LanguageSelect />
           <Logo light />
         </div>
@@ -39,16 +42,19 @@ export function SiteHeader() {
               key={n.to}
               to={n.to}
               activeOptions={{ exact: n.to === "/" }}
-              className="relative px-3 py-2 text-sm font-medium text-navy-foreground/80 transition-colors hover:text-navy-foreground data-[status=active]:text-gold"
+              className="relative whitespace-nowrap px-2.5 py-2 text-sm font-medium text-navy-foreground/80 transition-colors hover:text-navy-foreground data-[status=active]:text-gold"
             >
               {n.label}
             </Link>
           ))}
         </nav>
         <div className="hidden items-center gap-4 lg:flex">
-          <Link to="/contact" className="flex items-center gap-2 text-sm font-medium text-navy-foreground/80 hover:text-gold">
+          <Link to="/contact" className="hidden items-center gap-2 whitespace-nowrap text-sm xl:flex font-medium text-navy-foreground/80 hover:text-gold">
             <Phone className="h-4 w-4 text-gold" />
             {CONTACT.phone || "Contact us"}
+          </Link>
+          <Link to={user ? "/portal" : "/auth"} className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-navy-foreground/80 hover:text-gold">
+            <UserRound className="h-4 w-4 text-gold" />{portalLabel}
           </Link>
           <Button asChild variant="gold">
             <Link to="/contact" search={{ type: "quote" }}>Get a Quote</Link>
@@ -56,7 +62,7 @@ export function SiteHeader() {
         </div>
         <button
           type="button"
-          className="rounded-md p-2 text-navy-foreground lg:hidden"
+          className="shrink-0 rounded-md p-2 text-navy-foreground lg:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="mobile-nav"
@@ -85,6 +91,9 @@ export function SiteHeader() {
                 {n.label}
               </Link>
             ))}
+            <Link to={user ? "/portal" : "/auth"} tabIndex={open ? 0 : -1} className="flex items-center gap-2 rounded-lg px-3 py-3 font-display text-lg font-semibold text-gold hover:bg-navy">
+              <UserRound className="h-5 w-5" />{portalLabel}
+            </Link>
             <Button asChild variant="gold" size="xl" className="mt-4">
               <Link to="/contact" search={{ type: "quote" }} tabIndex={open ? 0 : -1}>Get a Quote</Link>
             </Button>

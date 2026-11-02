@@ -14,6 +14,11 @@ export const enquirySchema = z.object({
   destination: z.string().trim().max(160).optional().or(z.literal("")),
   shipmentDetails: z.string().trim().max(2000).optional().or(z.literal("")),
   message: z.string().trim().max(4000).optional().or(z.literal("")),
+  shipmentType: z.string().trim().max(120).optional().or(z.literal("")),
+  transportMethod: z.string().trim().max(120).optional().or(z.literal("")),
+  cargoDescription: z.string().trim().max(2000).optional().or(z.literal("")),
+  weightDimensions: z.string().trim().max(300).optional().or(z.literal("")),
+  preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use a valid date").optional().or(z.literal("")),
   // Spam protection: hidden honeypot must stay empty; form must be open >= 3s.
   website: z.string().max(0, "Spam detected").optional().or(z.literal("")),
   startedAt: z.number().int(),

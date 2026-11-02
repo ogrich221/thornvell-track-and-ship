@@ -47,7 +47,7 @@ export function LanguageSelect() {
       <select
         value={lang}
         onChange={(e) => change(e.target.value)}
-        className="max-w-[7.5rem] cursor-pointer bg-transparent outline-none [&>option]:bg-navy-deep [&>option]:text-navy-foreground"
+        className="max-w-[4.5rem] sm:max-w-[7.5rem] cursor-pointer bg-transparent outline-none [&>option]:bg-navy-deep [&>option]:text-navy-foreground"
       >
         {LANGUAGES.map((l) => (
           <option key={l.code} value={l.code}>{l.flag} {l.label}</option>
