@@ -6,3 +6,4 @@
 - [ ] Admin dashboard (shipments, customers, quotes, reports)
 - [ ] Email notifications (blocked: email domain setup)
 - [ ] Mobile + desktop friendly layouts for all new screens
+- [ ] Glass-style dashboards (customer + admin) featuring the logo
