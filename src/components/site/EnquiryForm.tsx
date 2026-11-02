@@ -77,9 +77,23 @@ export function EnquiryForm({ kind, defaultService = "" }: { kind: "contact" | "
       </Field>
       <Field errors={errors} name="origin" label="Origin"><input {...a("origin")} placeholder="City, country" /></Field>
       <Field errors={errors} name="destination" label="Destination"><input {...a("destination")} placeholder="City, country" /></Field>
-      <Field errors={errors} name="shipmentDetails" label="Shipment Details" full>
-        <textarea {...a("shipmentDetails")} rows={3} placeholder="Cargo type, weight, dimensions, quantity, preferred dates" />
-      </Field>
+      {kind === "quote" ? (
+        <>
+          <Field errors={errors} name="shipmentType" label="Shipment Type">
+            <select {...a("shipmentType")} defaultValue=""><option value="">Select type</option>{SHIPMENT_TYPES.map((s) => <option key={s}>{s}</option>)}</select>
+          </Field>
+          <Field errors={errors} name="transportMethod" label="Transportation Method">
+            <select {...a("transportMethod")} defaultValue=""><option value="">Select method</option>{TRANSPORT_METHODS.map((s) => <option key={s}>{s}</option>)}</select>
+          </Field>
+          <Field errors={errors} name="cargoDescription" label="Cargo Description" full><textarea {...a("cargoDescription")} rows={3} placeholder="What are you shipping?" /></Field>
+          <Field errors={errors} name="weightDimensions" label="Weight and Dimensions"><input {...a("weightDimensions")} placeholder="e.g. 1,200 kg · 2 pallets 120×100×150 cm" /></Field>
+          <Field errors={errors} name="preferredDate" label="Preferred Shipping Date"><input {...a("preferredDate")} type="date" /></Field>
+        </>
+      ) : (
+        <Field errors={errors} name="shipmentDetails" label="Shipment Details" full>
+          <textarea {...a("shipmentDetails")} rows={3} placeholder="Cargo type, weight, dimensions, quantity, preferred dates" />
+        </Field>
+      )}
       <Field errors={errors} name="message" label="Additional Message" full><textarea {...a("message")} rows={4} /></Field>
       {/* Honeypot: hidden from people, filled by bots */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
