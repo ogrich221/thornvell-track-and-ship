@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, LogOut, Mail, MessageCircle, Package, Phone, ShieldCheck } from "lucide-react";
+import { Loader2, LogOut, Mail, MessageCircle, Package, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,7 @@ function usePortalData(userId: string | undefined) {
 }
 
 function Portal() {
-  const { user, isAdmin } = useSession();
+  const { user } = useSession();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("overview");
@@ -73,7 +73,6 @@ function Portal() {
       intro="Manage your shipments, monitor delivery progress, and stay connected with your logistics partner."
       actions={
         <>
-          {isAdmin && <Button asChild variant="glass"><Link to="/admin"><ShieldCheck /> Admin</Link></Button>}
           <Button variant="glass" onClick={signOut}><LogOut /> Sign out</Button>
         </>
       }
