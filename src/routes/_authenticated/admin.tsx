@@ -41,14 +41,16 @@ function Admin() {
   }
   const fetchOverview = useServerFn(getAdminOverview);
   const [tab, setTab] = useState<Tab>("overview");
-  const { data, isLoading, error } = useQuery({ queryKey: ["admin"], queryFn: () => fetchOverview(), retry: false });
+  const { data, isLoading, error, refetch } = useQuery({ queryKey: ["admin"], queryFn: () => fetchOverview(), retry: false });
+  const forbidden = error?.message.includes("Forbidden") || error?.message.includes("Unauthorized");
 
   if (error)
     return (
-      <DashboardShell eyebrow="Restricted" title="Staff access only">
+      <DashboardShell eyebrow={forbidden ? "Restricted" : "Operations Control"} title={forbidden ? "Staff access only" : "Dashboard unavailable"}>
         <GlassCard className="mx-auto flex max-w-md flex-col items-center text-center">
           <ShieldAlert className="h-10 w-10 text-gold" />
-          <p className="mt-3 text-navy-foreground/75">This area is reserved for authorised Thornvell Logistics staff.</p>
+          <p className="mt-3 text-navy-foreground/75">{forbidden ? "This area is reserved for authorised Thornvell Logistics staff." : "We couldn't load your operations data. Please try again."}</p>
+          {!forbidden && <Button variant="gold" className="mt-5" onClick={() => refetch()}>Try again</Button>}
           <Button asChild variant="gold" className="mt-5"><Link to="/portal">Go to my dashboard</Link></Button>
         </GlassCard>
       </DashboardShell>

@@ -25,6 +25,7 @@ export const getAdminOverview = createServerFn({ method: "POST" })
       db.from("profiles").select("*").order("created_at", { ascending: false }).limit(500),
       db.from("notifications").select("id, status, channel, created_at, subject, user_id").order("created_at", { ascending: false }).limit(50),
     ]);
+    if (shipments.error || quotes.error || customers.error || notifications.error) throw new Error("Could not load operations data. Please try again.");
     return {
       shipments: shipments.data ?? [],
       quotes: quotes.data ?? [],
@@ -38,7 +39,8 @@ export const getShipmentEvents = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ shipmentId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const db = await requireAdmin(context as unknown as Ctx);
-    const { data: ev } = await db.from("shipment_events").select("*").eq("shipment_id", data.shipmentId).order("occurred_at", { ascending: false });
+    const { data: ev, error } = await db.from("shipment_events").select("*").eq("shipment_id", data.shipmentId).order("occurred_at", { ascending: false });
+    if (error) throw new Error("Could not load shipment history.");
     return ev ?? [];
   });
 
@@ -61,13 +63,15 @@ async function recordEvent(
   if (error) throw new Error("Could not record the update.");
   const patch: { current_status: string; updated_at: string; current_location?: string } = { current_status: ev.status, updated_at: new Date().toISOString() };
   if (ev.location) patch.current_location = ev.location;
-  const { data: s } = await db.from("shipments").update(patch).eq("id", shipmentId).select("customer_id, tracking_reference").single();
+  const { data: s, error: updateError } = await db.from("shipments").update(patch).eq("id", shipmentId).select("customer_id, tracking_reference").single();
+  if (updateError) throw new Error("The event was recorded, but the shipment summary could not be updated. Please contact staff before retrying.");
 
   // Queue a notification only for a genuine recorded event with an assigned customer who opted in.
   if (s?.customer_id) {
-    const { data: p } = await db.from("profiles").select("notify_email").eq("id", s.customer_id).maybeSingle();
+    const { data: p, error: profileError } = await db.from("profiles").select("notify_email").eq("id", s.customer_id).maybeSingle();
+    if (profileError) throw new Error("Shipment updated, but notification preferences could not be checked.");
     if (p?.notify_email) {
-      await db.from("notifications").insert({
+      const { error: notificationError } = await db.from("notifications").insert({
         user_id: s.customer_id,
         shipment_id: shipmentId,
         event_id: event.id,
@@ -75,6 +79,7 @@ async function recordEvent(
         status: "pending",
         subject: `${s.tracking_reference}: ${ev.status}`,
       });
+      if (notificationError) throw new Error("Shipment updated, but its email notification could not be queued.");
     }
   }
 }
@@ -114,7 +119,7 @@ export const updateShipment = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => shipmentFields.extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const db = await requireAdmin(context as unknown as Ctx);
-    const { error } = await db
+    const { data: saved, error } = await db
       .from("shipments")
       .update({
         customer_id: data.customerId,
@@ -126,8 +131,8 @@ export const updateShipment = createServerFn({ method: "POST" })
         estimated_delivery: data.estimatedDelivery,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", data.id);
-    if (error) throw new Error("Could not save shipment.");
+      .eq("id", data.id).select("id").single();
+    if (error || !saved) throw new Error("Could not save shipment. It may no longer exist.");
     return { ok: true };
   });
 
@@ -149,11 +154,11 @@ export const updateQuote = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const db = await requireAdmin(context as unknown as Ctx);
-    const { error } = await db
+    const { data: saved, error } = await db
       .from("enquiries")
       .update({ quote_status: data.status, admin_response: data.response || null, responded_at: data.response ? new Date().toISOString() : null })
-      .eq("id", data.id);
-    if (error) throw new Error("Could not update quote.");
+      .eq("id", data.id).select("id").single();
+    if (error || !saved) throw new Error("Could not update quote. It may no longer exist.");
     return { ok: true };
   });
 
@@ -162,7 +167,7 @@ export const updateCustomer = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), fullName: opt, company: opt, phone: opt }).parse(d))
   .handler(async ({ context, data }) => {
     const db = await requireAdmin(context as unknown as Ctx);
-    const { error } = await db.from("profiles").update({ full_name: data.fullName, company: data.company, phone: data.phone, updated_at: new Date().toISOString() }).eq("id", data.id);
-    if (error) throw new Error("Could not update customer.");
+    const { data: saved, error } = await db.from("profiles").update({ full_name: data.fullName, company: data.company, phone: data.phone, updated_at: new Date().toISOString() }).eq("id", data.id).select("id").single();
+    if (error || !saved) throw new Error("Could not update customer. The profile may no longer exist.");
     return { ok: true };
   });

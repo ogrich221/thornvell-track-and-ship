@@ -35,10 +35,11 @@ function usePortalData(userId: string | undefined) {
     queryKey: ["portal", userId],
     enabled: !!userId,
     queryFn: async () => {
+      if (!userId) throw new Error("Please sign in to load your dashboard.");
       const [s, q, p] = await Promise.all([
-        supabase.from("shipments").select("*").eq("customer_id", userId!).order("created_at", { ascending: false }),
-        supabase.from("enquiries").select("*").eq("user_id", userId!).order("created_at", { ascending: false }),
-        supabase.from("profiles").select("*").eq("id", userId!).maybeSingle(),
+        supabase.from("shipments").select("*").eq("customer_id", userId).order("created_at", { ascending: false }),
+        supabase.from("enquiries").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
+        supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       ]);
       if (s.error || q.error || p.error) throw new Error("Could not load your dashboard.");
       return { shipments: s.data, quotes: q.data, profile: p.data };
@@ -158,11 +159,16 @@ function ShipmentList({ rows, openId, setOpenId, empty }: { rows: ShipmentRow[];
 }
 
 function ShipmentDetail({ row }: { row: ShipmentRow }) {
-  const { data: events, isLoading } = useQuery({
+  const { data: events, isLoading, error } = useQuery({
     queryKey: ["events", row.id],
-    queryFn: async () => (await supabase.from("shipment_events").select("*").eq("shipment_id", row.id).order("occurred_at", { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const result = await supabase.from("shipment_events").select("*").eq("shipment_id", row.id).order("occurred_at", { ascending: false });
+      if (result.error) throw new Error("Could not load shipment history. Please try again.");
+      return result.data;
+    },
   });
   if (isLoading) return <div className="p-5"><Loader2 className="animate-spin text-gold" /></div>;
+  if (error) return <p role="alert" className="p-5 text-destructive">Could not load shipment history. Please try again.</p>;
   return (
     <div className="p-3 pt-0 sm:p-5 sm:pt-0">
       <ShipmentCard
@@ -214,7 +220,7 @@ function ProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () => vo
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     setBusy(true);
-    const { error } = await supabase
+    const { data: saved, error } = await supabase
       .from("profiles")
       .update({
         full_name: String(fd.get("fullName") || "").slice(0, 120) || null,
@@ -225,9 +231,9 @@ function ProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () => vo
         notify_whatsapp: fd.get("notifyWhatsapp") === "on",
         updated_at: new Date().toISOString(),
       })
-      .eq("id", profile.id);
+      .eq("id", profile.id).select("id").single();
     setBusy(false);
-    if (error) {
+    if (error || !saved) {
       toast.error("Could not save your profile.");
       return;
     }

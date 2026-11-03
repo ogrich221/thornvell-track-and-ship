@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Test quote submission → admin response → requester readback, shipment/customer edits, profile saves, and signed-out access (separate customer-only account not available)
+- [x] Test tracking with real recorded shipment updates and unknown references
 - [x] Separate dashboard presentation from the public website and refine admin/customer profiles
 - [x] Admin access: send staff directly to operations dashboard, without customer-account or bank-account requirements
 - [x] Database: profiles, roles, customer-linked shipments, richer quotes, notification log
