@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Menu, Phone, UserRound, X } from "lucide-react";
 import { useSession } from "@/hooks/use-session";
+import { dashboardPath } from "@/lib/dashboard-access";
 import { Button } from "@/components/ui/button";
 import { CONTACT, NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -13,8 +14,9 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
-  const { user } = useSession();
-  const portalLabel = user ? "My Portal" : "Customer Login";
+  const { user, isAdmin } = useSession();
+  const portalLabel = user ? (isAdmin ? "Admin Dashboard" : "My Portal") : "Sign in";
+  const portalPath = user ? dashboardPath(isAdmin) : "/auth";
   const overHero = (pathname === "/" || pathname === "/portal" || pathname === "/admin" || pathname === "/auth") && !scrolled && !open;
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export function SiteHeader() {
             <Phone className="h-4 w-4 text-gold" />
             {CONTACT.phone || "Contact us"}
           </Link>
-          <Link to={user ? "/portal" : "/auth"} className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-navy-foreground/80 hover:text-gold">
+          <Link to={portalPath} className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-navy-foreground/80 hover:text-gold">
             <UserRound className="h-4 w-4 text-gold" />{portalLabel}
           </Link>
           <Button asChild variant="gold">
@@ -95,7 +97,7 @@ export function SiteHeader() {
                 {n.label}
               </Link>
             ))}
-            <Link to={user ? "/portal" : "/auth"} tabIndex={open ? 0 : -1} className="flex items-center gap-2 rounded-lg px-3 py-3 font-display text-lg font-semibold text-gold hover:bg-navy">
+            <Link to={portalPath} tabIndex={open ? 0 : -1} className="flex items-center gap-2 rounded-lg px-3 py-3 font-display text-lg font-semibold text-gold hover:bg-navy">
               <UserRound className="h-5 w-5" />{portalLabel}
             </Link>
             <Button asChild variant="gold" size="xl" className="mt-4">

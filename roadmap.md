@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Admin access: send staff directly to operations dashboard, without customer-account or bank-account requirements
 - [x] Database: profiles, roles, customer-linked shipments, richer quotes, notification log
 - [x] Customer login/register/reset + portal
 - [x] Tracking: dispatch/ETA/location + visual timeline

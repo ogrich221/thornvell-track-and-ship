@@ -1,14 +1,15 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Plus, ShieldAlert, UserRound } from "lucide-react";
+import { Loader2, LogOut, Plus, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DashboardShell, GlassCard, glassField, Stat, TabBar } from "@/components/portal/DashboardShell";
 import { addShipmentEvent, createShipment, getAdminOverview, getShipmentEvents, updateCustomer, updateQuote, updateShipment } from "@/lib/admin.functions";
 import { fmtDate, QUOTE_STATUSES, SHIPMENT_STATUSES } from "@/lib/platform";
 import { SERVICE_OPTIONS } from "@/lib/site";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   staticData: { sitemap: false },
@@ -30,6 +31,14 @@ type Tab = "overview" | "shipments" | "quotes" | "customers" | "reports";
 type Overview = Awaited<ReturnType<typeof getAdminOverview>>;
 
 function Admin() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  async function signOut() {
+    await qc.cancelQueries();
+    qc.clear();
+    await supabase.auth.signOut();
+    await navigate({ to: "/auth", replace: true });
+  }
   const fetchOverview = useServerFn(getAdminOverview);
   const [tab, setTab] = useState<Tab>("overview");
   const { data, isLoading, error } = useQuery({ queryKey: ["admin"], queryFn: () => fetchOverview(), retry: false });
@@ -50,7 +59,7 @@ function Admin() {
       eyebrow="Operations Control"
       title="Thornvell Operations Dashboard"
       intro="Register shipments, publish verified tracking updates, and respond to customer quote requests."
-      actions={<Button asChild variant="glass"><Link to="/portal"><UserRound /> My portal</Link></Button>}
+      actions={<Button variant="glass" onClick={signOut}><LogOut /> Sign out</Button>}
     >
       <TabBar value={tab} onChange={setTab} tabs={[
         { id: "overview", label: "Overview" },

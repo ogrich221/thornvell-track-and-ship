@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { getDashboardPath } from "@/lib/dashboard-session";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { DashboardShell, GlassCard, glassField } from "@/components/portal/DashboardShell";
@@ -34,11 +35,16 @@ function ResetPage() {
     if (f.password.length < 8) return setErr("Password must be at least 8 characters.");
     if (f.password !== f.confirm) return setErr("Passwords do not match.");
     setBusy(true);
-    const { error } = await supabase.auth.updateUser({ password: f.password });
+    const { data, error } = await supabase.auth.updateUser({ password: f.password });
     setBusy(false);
     if (error) return setErr(error.message);
     toast.success("Password updated");
-    navigate({ to: "/portal" });
+    if (!data.user) return setErr("Please sign in with your new password.");
+    try {
+      await navigate({ to: await getDashboardPath(data.user.id), replace: true });
+    } catch {
+      setErr("Password updated. Please return to sign in.");
+    }
   }
 
   return (
