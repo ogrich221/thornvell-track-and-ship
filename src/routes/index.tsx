@@ -19,8 +19,11 @@ import { SectionHeading } from "@/components/site/Sections";
 import { CoverageGlobe } from "@/components/site/CoverageGlobe";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Thornvell Logistics — Global Logistics. Without Limits." },
       { name: "description", content: "Freight forwarding, air, sea and road freight, warehousing and courier coordination. Request a quote or track your shipment with Thornvell Logistics." },
       { property: "og:title", content: "Thornvell Logistics — Global Logistics. Without Limits." },

@@ -13,6 +13,7 @@ import { fmtDate } from "@/lib/platform";
 import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/_authenticated/portal")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Customer Dashboard — Thornvell Logistics" },

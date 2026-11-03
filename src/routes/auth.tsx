@@ -8,6 +8,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { DashboardShell, GlassCard, glassField, TabBar } from "@/components/portal/DashboardShell";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Customer Login — Thornvell Logistics" },

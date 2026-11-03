@@ -16,3 +16,5 @@
 - Admin writes go through `src/lib/admin.functions.ts` (auth middleware + has_role check, then admin client); customer reads use the browser client under RLS (own rows only).
 - Shipment updates queue rows in `notifications` (status pending) only for real recorded events; an email sender should consume these once a sending domain exists, and SMS/WhatsApp reuse the same table via `channel`.
 - Dashboards use the shared glass shell in `src/components/portal/DashboardShell.tsx`.
+
+- Sitemap URLs derive from router staticData.sitemap decisions; exclude the authenticated subtree, account flows, and unfinished legal placeholders so new pages require an explicit discovery decision.
