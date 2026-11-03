@@ -11,9 +11,12 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/contact")({
+  staticData: { sitemap: true },
   validateSearch: searchSchema,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Contact & Request a Quote — Thornvell Logistics" },
       { name: "description", content: "Request a shipping quote or contact the Thornvell Logistics team about freight, transportation and warehousing." },
       { property: "og:title", content: "Contact Thornvell Logistics" },

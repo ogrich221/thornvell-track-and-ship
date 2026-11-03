@@ -11,6 +11,7 @@ import { fmtDate, QUOTE_STATUSES, SHIPMENT_STATUSES } from "@/lib/platform";
 import { SERVICE_OPTIONS } from "@/lib/site";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Operations Dashboard — Thornvell Logistics" },

@@ -7,6 +7,7 @@ const PAGES: Record<string, { title: string; body: string }> = {
 };
 
 export const Route = createFileRoute("/legal/$page")({
+  staticData: { sitemap: false },
   loader: ({ params }) => {
     const page = PAGES[params.page];
     if (!page) throw notFound();
@@ -14,6 +15,8 @@ export const Route = createFileRoute("/legal/$page")({
   },
   head: ({ loaderData }) => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: `${loaderData?.title ?? "Legal"} — Thornvell Logistics` },
       { name: "description", content: `${loaderData?.title ?? "Legal information"} for Thornvell Logistics.` },
       { property: "og:title", content: `${loaderData?.title ?? "Legal"} — Thornvell Logistics` },

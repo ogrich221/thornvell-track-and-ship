@@ -8,6 +8,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { DashboardShell, GlassCard, glassField } from "@/components/portal/DashboardShell";
 
 export const Route = createFileRoute("/reset-password")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Set a New Password — Thornvell Logistics" },
