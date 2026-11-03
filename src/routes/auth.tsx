@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { getDashboardPath } from "@/lib/dashboard-session";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { DashboardShell, GlassCard, glassField, TabBar } from "@/components/portal/DashboardShell";
@@ -11,10 +12,10 @@ export const Route = createFileRoute("/auth")({
   staticData: { sitemap: false },
   head: () => ({
     meta: [
-      { title: "Customer Login — Thornvell Logistics" },
-      { name: "description", content: "Sign in or register for the Thornvell Logistics customer portal to manage shipments and quotes." },
-      { property: "og:title", content: "Customer Login — Thornvell Logistics" },
-      { property: "og:description", content: "Access your Thornvell Logistics customer portal." },
+      { title: "Customer & Admin Login — Thornvell Logistics" },
+      { name: "description", content: "Sign in to the Thornvell Logistics customer portal or staff operations dashboard." },
+      { property: "og:title", content: "Customer & Admin Login — Thornvell Logistics" },
+      { property: "og:description", content: "Access your Thornvell Logistics customer or admin dashboard." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,7 +32,13 @@ function AuthPage() {
   const [msg, setMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => data.user && navigate({ to: "/portal", replace: true }));
+    let active = true;
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const to = await getDashboardPath(data.user.id);
+      if (active) await navigate({ to, replace: true });
+    }).catch(() => { if (active) setMsg("Could not check dashboard access. Please try again."); });
+    return () => { active = false; };
   }, [navigate]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -41,10 +48,12 @@ function AuthPage() {
     setMsg(null);
     try {
       if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email: f.email, password: f.password });
-        if (error) throw error;
+        const { data, error } = await supabase.auth.signInWithPassword({ email: f.email.trim(), password: f.password });
+        if (error) throw new Error(error.code === "invalid_credentials" ? "The email or password is incorrect. Please try again or use Forgot your password?" : error.message);
+        if (!data.user) throw new Error("Sign-in could not be completed. Please try again.");
+        const to = await getDashboardPath(data.user.id);
         toast.success("Welcome back");
-        navigate({ to: "/portal" });
+        await navigate({ to, replace: true });
       } else if (mode === "register") {
         if (f.password.length < 8) throw new Error("Password must be at least 8 characters.");
         const { error } = await supabase.auth.signUp({
@@ -67,7 +76,7 @@ function AuthPage() {
   }
 
   return (
-    <DashboardShell eyebrow="Customer Portal" title="Your logistics, in one place." intro="Sign in to manage shipments, follow delivery progress and review your quote requests.">
+    <DashboardShell eyebrow="Customer & Admin Access" title="Your logistics, in one place." intro="Sign in to your Thornvell Logistics dashboard.">
       <GlassCard className="mx-auto max-w-md">
         {mode !== "forgot" && (
           <TabBar tabs={[{ id: "signin", label: "Sign in" }, { id: "register", label: "Register" }]} value={mode} onChange={(m) => { setMode(m); setMsg(null); }} />
@@ -92,9 +101,9 @@ function AuthPage() {
             {mode === "signin" ? "Sign in" : mode === "register" ? "Create account" : "Send reset link"}
           </Button>
           {msg && <p role="status" className="rounded-lg border border-gold/40 bg-gold/10 p-3 text-sm">{msg}</p>}
-          <button type="button" onClick={() => { setMode(mode === "forgot" ? "signin" : "forgot"); setMsg(null); }} className="text-sm text-gold hover:underline">
+          <Button type="button" variant="link" onClick={() => { setMode(mode === "forgot" ? "signin" : "forgot"); setMsg(null); }} className="text-sm text-gold">
             {mode === "forgot" ? "Back to sign in" : "Forgot your password?"}
-          </button>
+          </Button>
         </form>
       </GlassCard>
     </DashboardShell>
