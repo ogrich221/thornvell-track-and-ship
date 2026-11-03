@@ -323,19 +323,22 @@ function CustomersTab({ d }: { d: Overview }) {
   const save = useServerFn(updateCustomer);
   const refresh = useRefresh();
   const [open, setOpen] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const customers = d.customers.filter((c) => [c.full_name, c.company, c.email, c.phone].some((value) => value?.toLowerCase().includes(search.toLowerCase())));
   return (
     <div className="grid gap-3">
-      {d.customers.map((c) => {
+      <div className="mb-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><h2 className="text-lg font-bold">Customer profiles <span className="text-sm font-normal text-gold">({d.customers.length})</span></h2><input aria-label="Search customers" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, company or email" className={glassField + " sm:max-w-xs"} /></div>
+      {customers.map((c) => {
         const count = d.shipments.filter((s) => s.customer_id === c.id).length;
         return (
           <GlassCard key={c.id} className="p-0">
-            <button onClick={() => setOpen(open === c.id ? null : c.id)} className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 text-left sm:p-5">
+            <Button variant="ghost" aria-expanded={open === c.id} onClick={() => setOpen(open === c.id ? null : c.id)} className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 whitespace-normal p-4 text-left hover:bg-navy-foreground/5 hover:text-navy-foreground sm:p-5">
               <div className="min-w-0">
                 <p className="truncate font-semibold">{c.full_name || "Unnamed customer"}{c.company && ` · ${c.company}`}</p>
                 <p className="truncate text-sm text-navy-foreground/65">{c.email}{c.phone && ` · ${c.phone}`}</p>
               </div>
               <span className="shrink-0 text-sm text-gold">{count} shipment{count === 1 ? "" : "s"}</span>
-            </button>
+            </Button>
             {open === c.id && (
               <form
                 className="grid gap-3 border-t border-navy-foreground/10 p-4 sm:grid-cols-3 sm:p-5"
@@ -345,16 +348,17 @@ function CustomersTab({ d }: { d: Overview }) {
                   try { await save({ data: { id: c.id, ...f } }); toast.success("Customer saved"); await refresh(); } catch { toast.error("Could not save customer"); }
                 }}
               >
-                <input name="fullName" defaultValue={c.full_name ?? ""} placeholder="Full name" className={glassField} />
-                <input name="company" defaultValue={c.company ?? ""} placeholder="Company" className={glassField} />
-                <input name="phone" defaultValue={c.phone ?? ""} placeholder="Phone" className={glassField} />
+                <div className="sm:col-span-3"><p className="text-xs uppercase tracking-widest text-gold">Contact details</p><p className="mt-1 break-all text-sm text-navy-foreground/65">{c.email} · Joined {fmtDate(c.created_at)}</p></div>
+                <label className="grid gap-1.5 text-sm">Full name<input name="fullName" defaultValue={c.full_name ?? ""} className={glassField} /></label>
+                <label className="grid gap-1.5 text-sm">Company<input name="company" defaultValue={c.company ?? ""} className={glassField} /></label>
+                <label className="grid gap-1.5 text-sm">Phone<input name="phone" type="tel" defaultValue={c.phone ?? ""} className={glassField} /></label>
                 <Button type="submit" variant="gold" className="sm:col-span-3">Save customer</Button>
               </form>
             )}
           </GlassCard>
         );
       })}
-      {!d.customers.length && <GlassCard><p className="text-center text-navy-foreground/65">No customers have registered yet.</p></GlassCard>}
+      {!customers.length && <GlassCard><p className="text-center text-navy-foreground/65">{search ? "No matching customers." : "No customers have registered yet."}</p></GlassCard>}
     </div>
   );
 }
