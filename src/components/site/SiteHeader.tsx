@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Menu, Phone, UserRound, X } from "lucide-react";
 import { useSession } from "@/hooks/use-session";
-import { dashboardPath } from "@/lib/dashboard-access";
 import { Button } from "@/components/ui/button";
 import { CONTACT, NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -14,9 +13,11 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
-  const { user, isAdmin } = useSession();
-  const portalLabel = user ? (isAdmin ? "Admin Dashboard" : "My Portal") : "Sign in";
-  const portalPath = user ? dashboardPath(isAdmin) : "/auth";
+  const { user } = useSession();
+  // Public site header never exposes admin access — admins reach the
+  // dashboard directly at /admin or from inside the customer portal.
+  const portalLabel = user ? "My Portal" : "Sign in";
+  const portalPath = user ? "/portal" : "/auth";
   const overHero = (pathname === "/" || pathname === "/portal" || pathname === "/admin" || pathname === "/auth") && !scrolled && !open;
 
   useEffect(() => {
