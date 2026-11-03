@@ -119,7 +119,7 @@ export const updateShipment = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => shipmentFields.extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const db = await requireAdmin(context as unknown as Ctx);
-    const { error } = await db
+    const { data: saved, error } = await db
       .from("shipments")
       .update({
         customer_id: data.customerId,
@@ -131,8 +131,8 @@ export const updateShipment = createServerFn({ method: "POST" })
         estimated_delivery: data.estimatedDelivery,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", data.id);
-    if (error) throw new Error("Could not save shipment.");
+      .eq("id", data.id).select("id").single();
+    if (error || !saved) throw new Error("Could not save shipment. It may no longer exist.");
     return { ok: true };
   });
 
@@ -154,11 +154,11 @@ export const updateQuote = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const db = await requireAdmin(context as unknown as Ctx);
-    const { error } = await db
+    const { data: saved, error } = await db
       .from("enquiries")
       .update({ quote_status: data.status, admin_response: data.response || null, responded_at: data.response ? new Date().toISOString() : null })
-      .eq("id", data.id);
-    if (error) throw new Error("Could not update quote.");
+      .eq("id", data.id).select("id").single();
+    if (error || !saved) throw new Error("Could not update quote. It may no longer exist.");
     return { ok: true };
   });
 
@@ -167,7 +167,7 @@ export const updateCustomer = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), fullName: opt, company: opt, phone: opt }).parse(d))
   .handler(async ({ context, data }) => {
     const db = await requireAdmin(context as unknown as Ctx);
-    const { error } = await db.from("profiles").update({ full_name: data.fullName, company: data.company, phone: data.phone, updated_at: new Date().toISOString() }).eq("id", data.id);
-    if (error) throw new Error("Could not update customer.");
+    const { data: saved, error } = await db.from("profiles").update({ full_name: data.fullName, company: data.company, phone: data.phone, updated_at: new Date().toISOString() }).eq("id", data.id).select("id").single();
+    if (error || !saved) throw new Error("Could not update customer. The profile may no longer exist.");
     return { ok: true };
   });
