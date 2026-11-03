@@ -40,11 +40,12 @@ export const trackShipment = createServerFn({ method: "POST" })
     if (error) throw new Error("Tracking is temporarily unavailable.");
     if (!shipment) return { status: "not_found", reference: data.reference };
 
-    const { data: events } = await supabaseAdmin
+    const { data: events, error: eventError } = await supabaseAdmin
       .from("shipment_events")
       .select("status, location, note, occurred_at")
       .eq("shipment_id", shipment.id)
       .order("occurred_at", { ascending: false });
+    if (eventError) throw new Error("Tracking history is temporarily unavailable. Please try again.");
 
     return {
       status: "found",

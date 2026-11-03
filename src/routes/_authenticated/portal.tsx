@@ -35,10 +35,11 @@ function usePortalData(userId: string | undefined) {
     queryKey: ["portal", userId],
     enabled: !!userId,
     queryFn: async () => {
+      if (!userId) throw new Error("Please sign in to load your dashboard.");
       const [s, q, p] = await Promise.all([
-        supabase.from("shipments").select("*").eq("customer_id", userId!).order("created_at", { ascending: false }),
-        supabase.from("enquiries").select("*").eq("user_id", userId!).order("created_at", { ascending: false }),
-        supabase.from("profiles").select("*").eq("id", userId!).maybeSingle(),
+        supabase.from("shipments").select("*").eq("customer_id", userId).order("created_at", { ascending: false }),
+        supabase.from("enquiries").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
+        supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       ]);
       if (s.error || q.error || p.error) throw new Error("Could not load your dashboard.");
       return { shipments: s.data, quotes: q.data, profile: p.data };
@@ -160,7 +161,11 @@ function ShipmentList({ rows, openId, setOpenId, empty }: { rows: ShipmentRow[];
 function ShipmentDetail({ row }: { row: ShipmentRow }) {
   const { data: events, isLoading } = useQuery({
     queryKey: ["events", row.id],
-    queryFn: async () => (await supabase.from("shipment_events").select("*").eq("shipment_id", row.id).order("occurred_at", { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const result = await supabase.from("shipment_events").select("*").eq("shipment_id", row.id).order("occurred_at", { ascending: false });
+      if (result.error) throw new Error("Could not load shipment history. Please try again.");
+      return result.data;
+    },
   });
   if (isLoading) return <div className="p-5"><Loader2 className="animate-spin text-gold" /></div>;
   return (

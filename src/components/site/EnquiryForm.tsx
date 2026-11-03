@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { SHIPMENT_TYPES, TRANSPORT_METHODS } from "@/lib/platform";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { enquirySchema } from "@/lib/enquiry-schema";
@@ -15,6 +16,7 @@ type Errors = Partial<Record<string, string>>;
 
 export function EnquiryForm({ kind, defaultService = "" }: { kind: "contact" | "quote"; defaultService?: string }) {
   const submit = useServerFn(submitEnquiry);
+  const queryClient = useQueryClient();
   const startedAt = useRef(Date.now());
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -37,6 +39,7 @@ export function EnquiryForm({ kind, defaultService = "" }: { kind: "contact" | "
     setStatus("sending");
     try {
       await submit({ data: parsed.data });
+      await Promise.all([queryClient.invalidateQueries({ queryKey: ["portal"] }), queryClient.invalidateQueries({ queryKey: ["admin"] })]);
       setStatus("sent");
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Something went wrong.");

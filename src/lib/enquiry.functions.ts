@@ -13,8 +13,9 @@ export const submitEnquiry = createServerFn({ method: "POST" })
     let userId: string | null = null;
     const auth = getRequestHeader("authorization");
     if (auth?.startsWith("Bearer ")) {
-      const { data: u } = await supabaseAdmin.auth.getUser(auth.slice(7));
-      userId = u.user?.id ?? null;
+      const { data: u, error } = await supabaseAdmin.auth.getUser(auth.slice(7));
+      if (error || !u.user) throw new Error("Your session has expired. Please sign in again before sending your enquiry.");
+      userId = u.user.id;
     }
     const { error } = await supabaseAdmin.from("enquiries").insert({
       user_id: userId,
