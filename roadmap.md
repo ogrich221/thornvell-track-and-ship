@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Separate dashboard presentation from the public website and refine admin/customer profiles
 - [x] Admin access: send staff directly to operations dashboard, without customer-account or bank-account requirements
 - [x] Database: profiles, roles, customer-linked shipments, richer quotes, notification log
 - [x] Customer login/register/reset + portal

@@ -60,14 +60,14 @@ function Admin() {
       title="Thornvell Operations Dashboard"
       intro="Register shipments, publish verified tracking updates, and respond to customer quote requests."
       actions={<Button variant="glass" onClick={signOut}><LogOut /> Sign out</Button>}
-    >
-      <TabBar value={tab} onChange={setTab} tabs={[
+      navigation={<TabBar value={tab} onChange={setTab} tabs={[
         { id: "overview", label: "Overview" },
         { id: "shipments", label: "Shipments" },
         { id: "quotes", label: "Quotes & Enquiries" },
         { id: "customers", label: "Customers" },
         { id: "reports", label: "Reports" },
-      ]} />
+      ]} />}
+    >
       {isLoading || !data ? (
         <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-gold" /></div>
       ) : (

@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -119,6 +120,8 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
+  const { pathname } = useLocation();
+  const isAccountPage = ["/admin", "/portal", "/auth", "/reset-password"].includes(pathname);
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   useEffect(() => {
@@ -135,11 +138,11 @@ function RootComponent() {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-gold focus:px-4 focus:py-2 focus:text-navy-deep">
         Skip to content
       </a>
-      <SiteHeader />
+      {!isAccountPage && <SiteHeader />}
       <main id="main">
         <Outlet />
       </main>
-      <SiteFooter />
+      {!isAccountPage && <SiteFooter />}
       <Toaster />
     </QueryClientProvider>
   );
