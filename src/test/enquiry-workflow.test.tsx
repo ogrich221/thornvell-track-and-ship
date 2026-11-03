@@ -22,6 +22,6 @@ describe("quote submission refresh", () => {
     await waitFor(() => expect(submit).toHaveBeenCalledOnce());
     await waitFor(() => expect(invalidate).toHaveBeenCalledWith({ queryKey: ["portal"] }));
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ["admin"] });
-    expect(submit.mock.calls[0][0].data.kind).toBe("quote");
+    expect(submit.mock.calls[0]?.[0]?.data.kind).toBe("quote");
   });
 });
