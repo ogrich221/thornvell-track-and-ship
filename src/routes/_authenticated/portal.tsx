@@ -76,8 +76,7 @@ function Portal() {
           <Button variant="glass" onClick={signOut}><LogOut /> Sign out</Button>
         </>
       }
-    >
-      <TabBar
+      navigation={<TabBar
         value={tab}
         onChange={setTab}
         tabs={[
@@ -88,7 +87,8 @@ function Portal() {
           { id: "profile", label: "Profile" },
           { id: "support", label: "Support" },
         ]}
-      />
+      />}
+    >
       {isLoading ? (
         <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-gold" /></div>
       ) : error ? (
@@ -240,12 +240,16 @@ function ProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () => vo
     { name: "notifyWhatsapp", label: "WhatsApp updates", icon: MessageCircle, on: profile.notify_whatsapp, note: "Coming soon" },
   ];
   return (
-    <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-2">
+    <form onSubmit={onSubmit} className="grid gap-6 xl:grid-cols-2">
+      <div className="flex flex-wrap items-center gap-4 border-b border-navy-foreground/10 pb-6 xl:col-span-2">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-gold/30 bg-gold/10 font-display text-xl font-bold text-gold">{(profile.full_name || "Customer").split(" ").filter(Boolean).slice(0, 2).map((word) => word[0]).join("")}</div>
+        <div className="min-w-0 flex-1"><p className="text-lg font-bold break-words">{profile.full_name || "Your profile"}</p><p className="break-all text-sm text-navy-foreground/65">{profile.email}</p><p className="mt-1 text-xs text-gold">Customer account · Joined {fmtDate(profile.created_at)}</p></div>
+      </div>
       <GlassCard className="grid gap-4">
         <h2 className="text-lg font-bold">Your details</h2>
-        <label className="grid gap-1.5 text-sm">Full name<input name="fullName" defaultValue={profile.full_name ?? ""} className={glassField} /></label>
-        <label className="grid gap-1.5 text-sm">Company<input name="company" defaultValue={profile.company ?? ""} className={glassField} /></label>
-        <label className="grid gap-1.5 text-sm">Phone<input name="phone" type="tel" defaultValue={profile.phone ?? ""} className={glassField} /></label>
+        <label className="grid gap-1.5 text-sm">Full name<input name="fullName" autoComplete="name" maxLength={120} defaultValue={profile.full_name ?? ""} className={glassField} /></label>
+        <label className="grid gap-1.5 text-sm">Company<input name="company" autoComplete="organization" maxLength={160} defaultValue={profile.company ?? ""} className={glassField} /></label>
+        <label className="grid gap-1.5 text-sm">Phone<input name="phone" type="tel" autoComplete="tel" maxLength={25} defaultValue={profile.phone ?? ""} className={glassField} /></label>
         <label className="grid gap-1.5 text-sm">Email<input value={profile.email ?? ""} disabled className={glassField + " opacity-60"} /></label>
       </GlassCard>
       <GlassCard className="grid content-start gap-4">

@@ -1,4 +1,9 @@
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import { Building2, Headphones, Home, LayoutDashboard, Package, FileText, Plus, UserRound, Users, ChartNoAxesCombined, ArrowUpRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/site/Logo";
+import { NavArrows } from "@/components/site/NavArrows";
 import { cn } from "@/lib/utils";
 
 export function LogoMark({ className }: { className?: string }) {
@@ -12,39 +17,41 @@ export function LogoMark({ className }: { className?: string }) {
 }
 
 /** Dark navy stage with drifting gold light, a large rotating logo emblem and frosted-glass content. */
-export function DashboardShell({ eyebrow, title, intro, actions, children }: { eyebrow: string; title: string; intro?: string; actions?: ReactNode; children: ReactNode }) {
+export function DashboardShell({ eyebrow, title, intro, actions, navigation, children }: { eyebrow: string; title: string; intro?: string; actions?: ReactNode; navigation?: ReactNode; children: ReactNode }) {
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-navy-deep pb-20 pt-28 text-navy-foreground">
+    <div className="relative isolate min-h-screen overflow-hidden bg-navy-deep pb-12 text-navy-foreground">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="animate-drift absolute -left-32 top-10 h-96 w-96 rounded-full bg-gold/20 blur-3xl" />
-        <div className="animate-drift absolute -right-24 top-1/3 h-[28rem] w-[28rem] rounded-full bg-navy blur-3xl [animation-delay:-6s]" />
-        <div className="animate-drift absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-gold/10 blur-3xl [animation-delay:-12s]" />
         <div className="absolute -right-40 -top-24 opacity-[0.07] sm:-right-20">
           <div className="animate-slow-spin"><LogoMark className="h-[34rem] w-[34rem]" /></div>
         </div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--navy-foreground)_8%,transparent)_1px,transparent_0)] [background-size:28px_28px]" />
       </div>
+      <header className="border-b border-navy-foreground/10 bg-navy-deep/80">
+        <div className="container-x flex min-h-20 flex-wrap items-center justify-between gap-3 py-4">
+          <Logo light />
+          <div className="flex items-center gap-3"><NavArrows /><Button asChild variant="glass" size="sm"><Link to="/"><Home className="h-4 w-4" /><span className="hidden sm:inline">Website</span></Link></Button></div>
+        </div>
+      </header>
       <div className="container-x">
-        <div className="glass grid gap-6 rounded-3xl p-6 sm:p-8 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center">
-          <div className="relative mx-auto h-20 w-20 shrink-0 md:mx-0">
-            <div className="absolute inset-0 rounded-2xl bg-gold/30 blur-xl" />
-            <LogoMark className="relative h-20 w-20 drop-shadow-xl" />
-          </div>
-          <div className="min-w-0 text-center md:text-left">
-            <p className="eyebrow justify-center md:justify-start">{eyebrow}</p>
+        <div className="grid gap-5 border-b border-navy-foreground/10 py-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+          <div className="min-w-0">
+            <p className="eyebrow">{eyebrow}</p>
             <h1 className="mt-2 text-2xl font-extrabold sm:text-3xl">{title}</h1>
             {intro && <p className="mt-2 max-w-2xl text-sm text-navy-foreground/70 sm:text-base">{intro}</p>}
           </div>
-          {actions && <div className="flex flex-wrap justify-center gap-2 md:justify-end">{actions}</div>}
+          {actions && <div className="flex flex-wrap gap-2 md:justify-end">{actions}</div>}
         </div>
-        <div className="mt-8">{children}</div>
+        <div className={cn("mt-6", navigation && "grid items-start gap-6 lg:grid-cols-[220px_minmax(0,1fr)]")}>
+          {navigation && <aside className="min-w-0 lg:sticky lg:top-6">{navigation}<div className="hidden border-t border-navy-foreground/10 px-4 pt-5 lg:block"><LogoMark className="mb-3 h-10 w-10" /><p className="text-xs font-semibold text-gold">THORNVELL LOGISTICS</p><p className="mt-1 text-xs text-navy-foreground/50">Moving business forward.</p></div></aside>}
+          <div className="min-w-0">{children}</div>
+        </div>
       </div>
     </div>
   );
 }
 
 export function GlassCard({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn("glass rounded-2xl p-5 sm:p-6", className)}>{children}</div>;
+  return <div className={cn("glass rounded-lg p-5 sm:p-6", className)}>{children}</div>;
 }
 
 export function Stat({ label, value }: { label: string; value: ReactNode }) {
@@ -59,19 +66,23 @@ export function Stat({ label, value }: { label: string; value: ReactNode }) {
 export const glassField = "glass-input w-full rounded-lg px-3 py-2.5 text-sm outline-none transition placeholder:text-navy-foreground/40 focus:border-gold focus:ring-2 focus:ring-gold/30 [&>option]:bg-navy-deep";
 
 export function TabBar<T extends string>({ tabs, value, onChange }: { tabs: { id: T; label: string }[]; value: T; onChange: (t: T) => void }) {
+  const icons: Record<string, typeof Home> = { overview: LayoutDashboard, shipments: Package, quotes: FileText, "new-quote": Plus, profile: UserRound, support: Headphones, customers: Users, reports: ChartNoAxesCombined, signin: UserRound, register: Plus };
+  const dashboard = tabs.some((t) => t.id === "overview");
   return (
-    <div className="glass -mx-1 mb-6 flex gap-1 overflow-x-auto rounded-xl p-1" role="tablist">
-      {tabs.map((t) => (
-        <button
+    <div className={cn("glass mb-5 flex gap-1 overflow-x-auto rounded-lg p-1", dashboard && "lg:flex-col lg:overflow-visible lg:bg-transparent lg:border-transparent")} role="tablist">
+      {tabs.map((t) => { const Icon = icons[t.id] ?? Building2; return (
+        <Button
           key={t.id}
+          variant="ghost"
           role="tab"
           aria-selected={value === t.id}
           onClick={() => onChange(t.id)}
-          className={cn("shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition", value === t.id ? "bg-gold text-navy-deep" : "text-navy-foreground/75 hover:bg-navy-foreground/10")}
+          className={cn("h-11 shrink-0 justify-start rounded-md px-3 text-sm font-medium transition", dashboard && "lg:w-full", value === t.id ? "bg-gold text-navy-deep hover:bg-gold-soft hover:text-navy-deep" : "text-navy-foreground/75 hover:bg-navy-foreground/10 hover:text-navy-foreground")}
         >
-          {t.label}
-        </button>
-      ))}
+          <Icon className="h-4 w-4" />{t.label}
+          {dashboard && value === t.id && <ArrowUpRight className="ml-auto hidden h-4 w-4 lg:block" />}
+        </Button>
+      ); })}
     </div>
   );
 }
